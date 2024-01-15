@@ -4,6 +4,7 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <limits.h>
+#include <stdarg.h>
 
 bool bytes_flag,lines_flag, words_flag;
 int arg_in;
@@ -52,16 +53,21 @@ int count_lines(const char *filename){
 	return line_count;
 }
 
-void print_file_results(const int bytes, const int lines, const int  words, const char *filename){
-	if (lines != 0) { 
-		printf("%d ", lines);
+void print_file_results(const char *filename, int variable_count, ...){
+	va_list args;
+	int curr_arg;
+	int i;
+
+	va_start (args, variable_count);
+	
+	for (i = 0; i < variable_count; i++){
+		curr_arg = va_arg(args,int);
+
+		if (curr_arg != 0){
+			printf("%d ", curr_arg);
+		}
 	}
-	if (words != 0) {
-		printf("%d ", words);
-	}
-	if (bytes != 0) {
-		printf("%d ", bytes);
-	}
+	va_end(args);
 	printf("%s\n", filename);
 	return;
 }
@@ -103,7 +109,7 @@ int main (int argc, char * argv[]){
 					break;
 				}
 
-				print_file_results(bytes_total, lines_total, words_total, argv[optind]);
+				print_file_results(argv[optind], 3, bytes_total, lines_total, words_total);
 				optind++;
 			}
 		}
