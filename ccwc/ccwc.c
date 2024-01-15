@@ -2,16 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
+#include <stdbool.h>
 
+bool bytes_flag,lines_flag, words_flag;
 int arg_in;
 static struct option long_opts [] = {
 	{"bytes", no_argument, 0, 'c'},
 	{"lines", no_argument, 0, 'l'},
 	{0,0,0,0}
 };
-
-int bytes_flag=0;
-int lines_flag=0;
 
 int count_bytes(const char *filename){
 	FILE * file_stream;
@@ -23,13 +22,26 @@ int count_bytes(const char *filename){
 		printf("File could not be opened.\n");
 	}
 	else{
-		printf("starting byte count : %d\n", byte_count);
 		while (getc(file_stream) != EOF){
 			byte_count ++;
 		}
 		fclose(file_stream);
 	}
 	return byte_count;
+}
+
+void print_file_results(const int bytes, const int lines, const int  words, const char *filename){
+	if (lines != 0) { 
+		printf("%d ", lines);
+	}
+	if (words != 0) {
+		printf("%d ", words);
+	}
+	if (bytes != 0) {
+		printf("%d ", bytes);
+	}
+	printf("%s\n", filename);
+	return;
 }
 
 int main (int argc, char * argv[]) {
@@ -42,10 +54,10 @@ int main (int argc, char * argv[]) {
 		}
 		switch(arg_in){
 			case 'c':
-				printf("Byte count\n");
+				bytes_flag = true;
 				break;
 			case 'l':
-				printf("Line count\n");
+				lines_flag = true;
 				break;
 			default:
 				abort();
@@ -54,35 +66,28 @@ int main (int argc, char * argv[]) {
 
 	if (optind < argc){
 		while (optind < argc){
-			printf ("non-option argv-elements: %s\n", argv[optind++]);
+			int bytes_total = 0;
+			int lines_total = 0;
+			int words_total = 0;
+
+			if ( bytes_flag ){
+				bytes_total = count_bytes(argv[optind]);
+			}
+			if (lines_flag){
+				break;
+			}
+			if (words_flag){
+				break;
+			}
+
+			print_file_results(bytes_total, lines_total, words_total, argv[optind]);
+			optind++;
 		}
 	}
 	else {
 		printf("No files given\n");
 		exit(1);
 	}
-
 	exit(0);
 }
-
-/*
-	*    else {
-	*        for ( int i = 0; i < argc; i++)
-	*        {
-	*            //printf("%s\n", argv[i]);
-	*            if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--count") == 0){
-	*                if (argv[i+1])
-	*                {
-	*                    char * filename = argv[i+1];
-	*                    int total_bytes = count_bytes(filename);
-	*                    printf("%d bytes\n", total_bytes);
-	*                }
-	*                else{
-	*                    printf("please provide a file.\n");
-	*                    return 0;
-	*                }
-	*            }
-	*        }
-	*
-	*/
 

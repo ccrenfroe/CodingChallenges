@@ -1,2 +1,5 @@
 ccwc: ccwc.c
-	cc ccwc.c -o ccwc
+	gcc ccwc.c -o ccwc.o
+
+debug_ccwc:
+	gcc -g ccwc.c -o ccwc_debug.o
