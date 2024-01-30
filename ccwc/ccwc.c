@@ -55,9 +55,9 @@ int * counter(const char *filename, bool bytes_flag, bool words_flag, bool lines
             line_count++;
 		fclose(file_stream);
 
-		if (lines_flag) {counts[0] = line_count;}
-		if (words_flag) {counts[1] = word_count;}
-		if (bytes_flag) {counts[2] = byte_count;}
+		counts[0] = lines_flag ? line_count : 0;
+		counts[1] = words_flag ? word_count : 0;
+		counts[2] = bytes_flag ? byte_count : 0;
 	}
 	return counts;
 }
@@ -70,7 +70,7 @@ void print_file_results(const char *filename, int * totals_array){
 	int array_size = sizeof(int) * COUNTS / sizeof(totals_array[0]);
 	for (i = 0; i < array_size; i++){
 		if (totals_array[i] != 0){
-			printf("%d ", totals_array[i]);
+			printf("%6d ", totals_array[i]);
 		}
 	}
 	printf("%s\n", filename);
@@ -95,18 +95,17 @@ int main (int argc, char * argv[]){
 			case 'w':
 				words_flag = true;
 				break;
-			default:
-				exit(1);
 		}
 	}
-	
+
+	// Default case - If no flags given, mark them all
+	if (bytes_flag == false && lines_flag == false && words_flag == false){
+		bytes_flag = lines_flag = words_flag = true;
+	}
+
 	if (bytes_flag | lines_flag | words_flag){
 		if (optind < argc){
 			while (optind < argc){
-				int bytes_total = 0;
-				int lines_total = 0;
-				int words_total = 0;
-
 				int * totals = counter(argv[optind], bytes_flag, words_flag, lines_flag);
 
 				print_file_results(argv[optind], totals);
